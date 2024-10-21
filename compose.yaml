@@ -1,0 +1,36 @@
+version: '3.8'
+
+services:
+  php:
+    build:
+      context: ./
+      dockerfile: ./docker/php/Dockerfile
+    ports:
+      - "80:80"
+    volumes:
+      - .:/var/www/html
+      - ./vendor:/var/www/html/vendor
+      - ./logs:/var/www/html/logs
+    networks:
+      - app-network
+
+  mysql:
+    image: mysql:8.0
+    environment:
+      MYSQL_ROOT_PASSWORD: root_password
+      MYSQL_DATABASE: department_db
+      MYSQL_USER: user
+      MYSQL_PASSWORD: user_password
+    ports:
+      - "3306:3306"
+    volumes:
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+      - db_data:/var/lib/mysql
+    networks:
+      - app-network
+
+networks:
+  app-network:
+
+volumes:
+  db_data:
