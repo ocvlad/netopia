@@ -1,0 +1,46 @@
+services:
+  App\Services\DatabaseService:
+    public: true
+
+  App\Services\LoggerService:
+    arguments:
+      $logName: 'app'
+      $logFile: '/var/www/html/logs/app.log'
+    public: true
+
+  App\Services\DepartmentService:
+    arguments:
+      $databaseService: '@App\Services\DatabaseService'
+      $logger: '@App\Services\LoggerService'
+    public: true
+
+  App\Services\UserService:
+    arguments:
+      $databaseService: '@App\Services\DatabaseService'
+    public: true
+
+  App\Services\AuthService:
+    arguments:
+      $userService: '@App\Services\UserService'
+      $secretKey: '%env(JWT_SECRET_KEY)%'
+    public: true
+
+  App\Validators\DepartmentValidator:
+    public: true
+
+  App\Controllers\DepartmentController:
+    arguments:
+      $departmentService: '@App\Services\DepartmentService'
+      $departmentValidator: '@App\Validators\DepartmentValidator'
+      $logger: '@App\Services\LoggerService'
+    public: true
+
+  App\Controllers\AuthController:
+    arguments:
+      $userService: '@App\Services\UserService'
+      $authService: '@App\Services\AuthService'
+      $logger: '@App\Services\LoggerService'
+    public: true
+
+parameters:
+  kernel.project_dir: '%env(BASE_DIR)%'
