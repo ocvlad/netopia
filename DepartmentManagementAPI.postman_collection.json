@@ -19,7 +19,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n    \"username\": \"your_username\",\n    \"password\": \"your_password\"\n}"
+              "raw": "{\n    \"username\": \"testuser\",\n    \"password\": \"password\"\n}"
             },
             "url": {
               "raw": "http://localhost/login",
