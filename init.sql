@@ -68,7 +68,7 @@ WITH RECURSIVE department_hierarchy AS (
     FROM
         departments
     WHERE
-        name = root_name
+        name = root_name AND (flags & 1) = 1
 
     UNION ALL
 
@@ -81,8 +81,10 @@ WITH RECURSIVE department_hierarchy AS (
         CONCAT(dh.path, ' > ', d.name)
     FROM
         departments d
-            INNER JOIN
+    INNER JOIN
         department_hierarchy dh ON d.parent_id = dh.id
+    WHERE
+        (d.flags & 1) = 1
 )
 SELECT
     id,
