@@ -67,11 +67,34 @@ class DepartmentService
         }
     }
 
-    public function getDirectDescendantsByName(string $name): array
+    public function getAllDescendantsByName(string $name): array
     {
-        $stmt = $this->db->prepare("CALL GetDirectDescendantsByName(:name)");
+        $stmt = $this->db->prepare("CALL GetDepartmentHierarchyByName(:name)");
         $stmt->bindParam(':name', $name);
         $stmt->execute();
-        return $stmt->fetchAll(\PDO::FETCH_ASSOC);
+
+        $departments = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+        return $this->buildHierarchy($departments);
+    }
+
+    private function buildHierarchy(array $departments): array
+    {
+        $map = [];
+        $root = [];
+
+        foreach ($departments as $department) {
+            $department['children'] = [];
+            $map[$department['id']] = $department;
+        }
+
+        foreach ($departments as $department) {
+            if ($department['parent_id'] === null) {
+                $root[] = &$map[$department['id']];
+            } else {
+                $map[$department['parent_id']]['children'][] = &$map[$department['id']];
+            }
+        }
+
+        return $root;
     }
 }

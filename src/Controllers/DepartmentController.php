@@ -153,7 +153,7 @@ class DepartmentController
         }
 
         try {
-            $descendants = $this->departmentService->getDirectDescendantsByName($name);
+            $descendants = $this->departmentService->getAllDescendantsByName($name);
 
             return new Response(json_encode($descendants), 200, ['Content-Type' => 'application/json']);
         } catch (\Exception $e) {

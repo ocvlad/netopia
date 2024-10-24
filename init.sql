@@ -55,12 +55,45 @@ END //
 DELIMITER ;
 
 DELIMITER //
-CREATE PROCEDURE GetDirectDescendantsByName(IN dept_name VARCHAR(100))
+CREATE PROCEDURE GetDepartmentHierarchyByName(IN root_name VARCHAR(100))
 BEGIN
-DECLARE dept_id INT;
-SELECT id INTO dept_id FROM departments WHERE name = dept_name;
-IF dept_id IS NOT NULL THEN
-SELECT * FROM departments WHERE parent_id = dept_id AND (flags & 1) = 1;
-END IF;
+WITH RECURSIVE department_hierarchy AS (
+    SELECT
+        id,
+        name,
+        parent_id,
+        flags,
+        0 AS level,
+        CAST(name AS CHAR(1000)) AS path
+    FROM
+        departments
+    WHERE
+        name = root_name
+
+    UNION ALL
+
+    SELECT
+        d.id,
+        d.name,
+        d.parent_id,
+        d.flags,
+        dh.level + 1,
+        CONCAT(dh.path, ' > ', d.name)
+    FROM
+        departments d
+            INNER JOIN
+        department_hierarchy dh ON d.parent_id = dh.id
+)
+SELECT
+    id,
+    name,
+    parent_id,
+    flags,
+    level,
+    path
+FROM
+    department_hierarchy
+ORDER BY
+    path;
 END //
 DELIMITER ;
